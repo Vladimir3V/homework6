@@ -12,14 +12,20 @@ class DoTwig
     public function letsDoTwig()
     {
         try {
-            include_once 'vendor/twig/twig/lib/Twig/Autoloader.php';
-            Twig_Autoloader::register();
+//            include_once 'vendor/twig/twig/lib/Twig/Autoloader.php';
+//            Twig_Autoloader::register();
             $loader = new Twig_Loader_Filesystem('view');
             $twig = new Twig_Environment($loader);
             $template = $twig->loadTemplate('main.tmpl');
             echo $template->render(
                 array(
-                    'username' => 'ckent'
+                    'username' => $_SESSION['username'],
+                    'password' => $_SESSION['password'],
+                    'name'     => $_SESSION['name'],
+                    'age'      => $_SESSION['age'],
+                    'about'    => $_SESSION['about'],
+                    'avatar'   => $_SESSION['avatar']
+
                 )
             );
         } catch (Exception $e) {

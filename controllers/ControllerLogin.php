@@ -10,33 +10,33 @@ class ControllerLogin
 {
     public $user;
     public $toview;
+    public $dotwig;
 
     function __construct()
     {
         $this->user   = new User();
         $this->toview = new ToView();
+        $this->dotwig = new DoTwig();
     }
 
     public function checkUser()
     {
-        if ($this->user->checkLoginPassword()) {
-            $this->showMain();
+
+        if (isset($_SESSION['id'])) {
+            $this->dotwig->letsDoTwig();
         } else {
-            $this->showLogin();
+            if ($this->user->checkLoginPassword()) {
+                $this->dotwig->letsDoTwig();
+            };
         }
     }
     public function showLogin()
     {
         if (isset($_SESSION['id'])) {
-            $this->showMain();
+            $this->dotwig->letsDoTwig();
         } else {
             $this->toview->pLogin();
         }
-    }
-
-    public function showMain()
-    {
-        $this->toview->pMain();
     }
 
     public function logout()

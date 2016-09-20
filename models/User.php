@@ -1,5 +1,4 @@
 <?php
-require_once 'vendor/autoload.php';
 
 use Intervention\Image\ImageManagerStatic as Imageres;
 /**
@@ -22,72 +21,12 @@ class User
     }
 
     /**
-     * DB_Operate constructor.
-     * @param $host
-     * @param $login
-     * @param $password
-     * @param $database
-     */
-    function __construct()
-    {
-        $a = new Connection();
-        $this->db_host  =  $a->host;
-        $this->db_login = $a->user;
-        $this->db_pass  = $a->password;
-        $this->db_name  = $a->dbace;
-    }
-
-    /**
-     * ПРоверяет есть ли база, если нет создает
-     */
-    public function dbChekMake()
-    {
-        $mysqli = new mysqli($this->db_host, $this->db_login, $this->db_pass);
-        if ($mysqli->connect_errno) {
-            exit('Не удалось подключиться к MySQL: ' . $mysqli->connect_error);
-        } else {
-            $db = new mysqli(
-                $this->db_host,
-                $this->db_login,
-                $this->db_pass,
-                $this->db_name
-            );
-            if ($db->connect_errno) {
-                $mysqli->query('CREATE DATABASE IF NOT EXISTS $this->db_name');
-                $mysqli->select_db($this->db_name);
-                $mysqli->query(
-                    "CREATE TABLE users (
-                             id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
-                             username VARCHAR(50),
-                             password VARCHAR(50),
-                             name VARCHAR(50),
-                             age INT (3),
-                             about VARCHAR(1000),
-                             avatar VARCHAR(50)
-                             )
-                             DEFAULT CHARSET = utf8 
-                             COLLATE=utf8_unicode_ci 
-                             AUTO_INCREMENT = 1"
-                );
-                $mysqli->query(
-                    "CREATE TABLE photos (
-                            id INT UNSIGNED PRIMARY KEY NOT NULL AUTO_INCREMENT,
-                            user_id INT UNSIGNED,
-                            file VARCHAR(200)
-                        )
-                        DEFAULT CHARSET = utf8 AUTO_INCREMENT = 1"
-                );
-            }
-        }
-    }
-
-    /**
      * Запрос всех данных о пользователе из базы
      * @return mixed
      */
     public function getInfo()
     {
-        $a = new Connection();
+        $a = new Conn();
         $db = new mysqli($a->host, $a->user, $a->password, $a->dbace);
         if (!$db->set_charset('utf8')) {
             printf('Ошибка при загрузке набора символов utf8: %s\n', $db->error);
@@ -98,18 +37,15 @@ class User
         }
 
         $idses = $_SESSION ['id'];
-        $res = $db->query(
-            "select * from users where id = '$idses'"
-        );
 
-        $record = $res->fetch_assoc();
+        $res = Users::find($idses);
+        $_SESSION ['username'] = $res->username;
+        $_SESSION ['password'] = $res->password;
+        $_SESSION ['name']     = $res->name;
+        $_SESSION ['age']      = $res->age;
+        $_SESSION ['about']    = $res->about;
+        $_SESSION ['avatar']   = $res->avatar;
 
-        $_SESSION ['username'] = $record ['username'];
-        $_SESSION ['password'] = $record ['password'];
-        $_SESSION ['name']     = $record ['name'];
-        $_SESSION ['age']      = $record ['age'];
-        $_SESSION ['about']    = $record ['about'];
-        $_SESSION ['avatar']   = $record ['avatar'];
         return $_SESSION;
     }
 
@@ -118,52 +54,81 @@ class User
      */
     public function addLoginPassword()
     {
-        $this->dbChekMake();
-        if (empty($_POST["g-recaptcha-response"])) {
-            echo 'Подтвердите что вы человек';
-            return false;
-        } else {
-            $user_login     = $_POST['registerLogin'];
-            $user_password  = $_POST['registerPassword'];
-            $user_password2 = $_POST['registerConfirm'];
-            if ($user_password == $user_password2) {
-                if (isset($user_login) || isset($user_password)) {
-                    if (empty($user_login) || empty($user_password)) {
-                        echo 'Данные введены неверно';
+        $a = new Conn();
+        $a->dbChekMake();
+
+        $user_login     = $_POST['registerLogin'];
+        $user_password  = $_POST['registerPassword'];
+        $user_password2 = $_POST['registerConfirm'];
+        $record = 27;
+        if ($user_password == $user_password2) {
+            if (isset($user_login) || isset($user_password)) {
+                if (empty($user_login) || empty($user_password)) {
+                    echo 'Данные введены неверно';
+                    return false;
+                } else {
+                    $user_login    = strip_tags($user_login);
+                    $user_password = strip_tags($user_password);
+
+                    $res = Users::where('username', $user_login)->get();
+
+                    foreach ($res as $item) {
+                        $record = $item->username;
+                    }
+
+                    if ($record != 27) {
+                        echo 'Такой пользователь уже существует';
                         return false;
                     } else {
-                        $user_login= strip_tags($user_login);
-                        $a = new Connection();
+                        $user = new Users();
+                        $user->username = $user_login;
+                        $user->password = $user_password;
+                        $user->save();
 
-                        $result = $a->connect()->query(
-                            "select * from users
-                        where username = '$user_login' LIMIT 0,1"
-                        );
-                        $record = $result->fetch_assoc();
-                        if (!empty($record)) {
-                            echo 'Такой пользователь уже существует';
-                            return false;
-                        } else {
-                            $a->connect()->query(
-                                "INSERT INTO `users` (username, password) 
-                            VALUES ('$user_login', '$user_password')"
-                            );
-
-                            $res = $a->connect()->query(
-                                "select id from users where username = '$user_login' "
-                            );
-                            $record = $res->fetch_assoc();
-                            $_SESSION ['id'] = $record ['id'];
-                            $this->getInfo();
-
-                            return true;
+                        $res = Users::where('username', $user_login)->get();
+                        foreach ($res as $item) {
+                            $_SESSION['id'] = $item->id;
                         }
+
+                        $this->getInfo();
+                        return true;
                     }
+
+
+
+
+
+//
+//                    $a = new Connection();
+//
+//                    $result = $a->connect()->query(
+//                        "select * from users
+//                        where username = '$user_login' LIMIT 0,1"
+//                    );
+//                    $record = $result->fetch_assoc();
+//                    if (!empty($record)) {
+//                        echo 'Такой пользователь уже существует';
+//                        return false;
+//                    } else {
+//                        $a->connect()->query(
+//                            "INSERT INTO `users` (username, password)
+//                            VALUES ('$user_login', '$user_password')"
+//                        );
+//
+//                        $res = $a->connect()->query(
+//                            "select id from users where username = '$user_login' "
+//                        );
+//                        $record = $res->fetch_assoc();
+//                        $_SESSION ['id'] = $record ['id'];
+//                        $this->getInfo();
+//
+//                        return true;
+//                    }
                 }
-            } else {
-                echo 'Пароли не совпадают';
-                return false;
             }
+        } else {
+            echo 'Пароли не совпадают';
+            return false;
         }
     }
 
@@ -177,13 +142,14 @@ class User
 
         if (empty($_POST['Username']) || empty($_POST['Password'])) {
             echo 'Логин и пароль не могут быть пустыми';
+            return false;
         } else {
             $arr['username'] = strip_tags($_POST['Username']);
             $arr['password'] = strip_tags($_POST['Password']);
             $arr['name']     = strip_tags($_POST['Name']);
             $arr['age']      = strip_tags($_POST['Age']);
             $arr['about']    = strip_tags($_POST['About']);
-            $a = new Connection();
+            $a = new Conn();
             $db = new mysqli($a->host, $a->user, $a->password, $a->dbace);
             if (!$db->set_charset('utf8')) {
                 printf(
@@ -226,11 +192,9 @@ class User
      */
     public function checkLoginPassword()
     {
-        $this->dbChekMake();
         if (empty($_POST["g-recaptcha-response"])) {
-
             echo 'Подтвердите что вы человек';
-            return false;
+            return true;
         } else {
             if (isset($_POST['usernameLogin']) || isset($_POST['passwordLogin'])) {
                 if (empty($_POST['usernameLogin'])
@@ -240,7 +204,7 @@ class User
                 } else {
                     $user_login    = $_POST['usernameLogin'];
                     $user_password = $_POST['passwordLogin'];
-                    $a = new Connection();
+                    $a = new Conn();
                     $result = $a->connect()->query(
                         "select * from users where username = '$user_login' LIMIT 0,1"
                     );
@@ -284,6 +248,7 @@ class User
         $imageType = pathinfo($target_file, PATHINFO_EXTENSION);
         if ($target_file == $target_dir) {
             echo 'Вы не выбрали файл ';
+            return false;
         } else {
             $check = getimagesize($img['img']['tmp_name']);
             if ($check !== false) {
@@ -320,7 +285,7 @@ class User
                         . basename($img['img']['name'])
                         . " был загружен <br><br>";
 
-                    $a = new Connection();
+                    $a = new Conn();
                     $db = new mysqli(
                         $a->host,
                         $a->user,
@@ -345,6 +310,7 @@ class User
                     $db->close();
                     return true;
                 }
+                return false;
             }
         }
     }
@@ -355,10 +321,9 @@ class User
      */
     public function addAvatar()
     {
-        if (file_exists('/img/avatars') === false) {//строгое сравнение
+        if (file_exists('/img/avatars') === false) {
             mkdir('./img', 0777);
             mkdir('./img/avatars', 0777);
-            //здесь не создается папка - поправил
         }
 
         $img         = $_FILES;
@@ -369,9 +334,10 @@ class User
         $imageType   = pathinfo($target_file, PATHINFO_EXTENSION);
         $id          = $_SESSION ['id'];
         if ($target_file == $target_dir) {
-            echo 'Вы не выбрали файл ';//двойные кавычки - поправил
+            echo 'Вы не выбрали файл ';
+            return false;
         } else {
-            $check = getimagesize($img['img']['tmp_name']);//двойные кавычки - поправил
+            $check = getimagesize($img['img']['tmp_name']);
             if ($check !== false) {
             } else {
                 echo 'Это не картинка';
@@ -406,7 +372,7 @@ class User
                         . basename($img['img']['name'])
                         . ' был загружен <br><br>';
 
-                    $a = new Connection();
+                    $a = new Conn();
                     $db = new mysqli(
                         $a->host,
                         $a->user,
@@ -439,6 +405,7 @@ class User
                         echo 'не получилось';
                     }
                 }
+                return false;
             }
         }
     }
@@ -450,7 +417,7 @@ class User
     public function getAllPhoto()
     {
         $id = $_SESSION['id'];
-        $a = new Connection();
+        $a = new Conn();
         $res = $a -> connect()->query(
             "select file from photos where user_id = '$id'"
         );
@@ -461,11 +428,8 @@ class User
                 echo $item;
                 echo '<br>';
             }
-
         }
-
         return true;
-
     }
 
     /**
@@ -474,7 +438,7 @@ class User
      */
     public function getAllUser()
     {
-        $a = new Connection();
+        $a = new Conn();
         $res = $a -> connect()->query(
         "select name,age from users ORDER BY age"
     );
@@ -511,7 +475,7 @@ class User
     public function deletUser()
     {
         $userid = $_SESSION ['id'];
-        $a = new Connection();
+        $a = new Conn();
         $a->connect()->query("DELETE FROM `users` WHERE 'id' = $userid");
         unset($_SESSION['id']);
         session_destroy();

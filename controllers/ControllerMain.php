@@ -23,30 +23,11 @@ class ControllerMain
 
     public function showMain()
     {
-//        $this->toview->pMain();
-        try {
-            include_once 'vendor/twig/twig/lib/Twig/Autoloader.php';
-            Twig_Autoloader::register();
-            $loader = new Twig_Loader_Filesystem('view');
-            $twig = new Twig_Environment($loader);
-            $template = $twig->loadTemplate('main.tmpl');
-            echo $template->render(
-                array(
-                    'username' => 'ckent'
-                )
-            );
-        } catch (Exception $e) {
-            die ('ERROR: ' . $e->getMessage());
-        }
-
-
+        $this->dotwig->letsDoTwig();
     }
 
     public function addAvatar()
     {
-        //так как ты везде создаешь экземпляр User
-        //можешь его проинициализивароть в конструкторе и записать в свойстве
-        //тем самым избавив себя от дублирования кода -- Понял, поправил
         if ($this->user->addAvatar()) {
             $this->showMain();
         }

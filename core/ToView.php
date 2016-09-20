@@ -13,11 +13,6 @@ class ToView
         include_once 'view/404.html';
     }
 
-    public function pMain()
-    {
-        include_once 'view/main.tmpl';
-    }
-
     public function pLogin ()
     {
         include_once 'view/login.html';

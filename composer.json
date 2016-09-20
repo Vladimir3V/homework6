@@ -11,6 +11,9 @@
   ],
   "require": {
     "phpmailer/phpmailer": "^5.2",
-    "twig/twig": "~1.0"
+    "twig/twig": "~1.0",
+    "illuminate/html": "^5.0",
+    "wixel/gump": "^1.4",
+    "illuminate/database": "^5.2"
   }
 }

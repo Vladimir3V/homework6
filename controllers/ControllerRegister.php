@@ -11,18 +11,20 @@ class ControllerRegister
     public $user;
     public $toview;
     public $mail;
+    public $dotwig;
 
     function __construct()
     {
-        $this->user   = new User();
+        $this->user = new User();
         $this->toview = new ToView();
-        $this->mail   = new Mail();
+        $this->mail = new Mail();
+        $this->dotwig = new DoTwig();
     }
 
     public function showRegister()
     {
         if (isset($_SESSION['id'])) {
-            $this->showMain();
+            $this->dotwig->letsDoTwig();
 
         } else {
             $this->toview->pRegister();
@@ -32,17 +34,14 @@ class ControllerRegister
 
     public function checkPassword()
     {
-        if ($this->user->addLoginPassword()) {
-            $this->showMain();
-            $this->mail->sentMail();
-
+        if (isset($_SESSION['id'])) {
+            $this->dotwig->letsDoTwig();
         } else {
-            $this->showRegister();
-        }
-    }
+            if ($this->user->addLoginPassword()) {
+                $this->mail->sentMail();
+                $this->dotwig->letsDoTwig();
+            };
 
-    public function showMain()
-    {
-        $this->toview->pMain();
+        }
     }
 }

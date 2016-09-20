@@ -28,16 +28,20 @@ class Route
         }
 
         $controller_name = 'Controller'.$controller_name;
-        include_once 'core/ToView.php';
-        include_once 'core/Connection.php';
+
         include_once 'vendor/autoload.php';
-        include_once 'models/User.php';
-        include_once 'models/Mail.php';
+        include_once 'core/config.php';
 
+        function fileAutoload($class_name)
+        {
+            if (file_exists('models/' . $class_name . '.php')) {
+                include 'models/' . $class_name . '.php';
+            } else {
+                include 'core/' . $class_name . '.php';
+            }
+        }
 
-        //psr-2 можно сделать через autoload
-        // К сожалению не нашел что psr-2 говорит про require_once
-
+        spl_autoload_register('fileAutoload');
 
         $controller_file = $controller_name.'.php';
         $controller_path = 'controllers/'.$controller_file;
@@ -55,7 +59,20 @@ class Route
         } else {
             Route::errorPage404();
         }
+
+        function __autoload($class_name)
+        {
+            include 'models/' . $class_name . '.php';
+            include 'core/' . $class_name . '.php';
+            print_r('models/' . $class_name . '.php');
+//            if (include 'core/' . $class_name . '.php') {
+//            } else {
+//                include 'models/' . $class_name . '.php';
+//            }
+        }
+
     }
+
 
     static function errorPage404()//psr-2 -- не могу понять в чем ошибка
     {
