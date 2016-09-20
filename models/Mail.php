@@ -10,7 +10,7 @@ class Mail
 {
     public function sentMail()
     {
-        require 'vendor/phpmailer/phpmailer/PHPMailerAutoload.php';
+        include 'vendor/phpmailer/phpmailer/PHPMailerAutoload.php';
 
         $mail = new PHPMailer;
 
