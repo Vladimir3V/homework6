@@ -54,80 +54,84 @@ class User
      */
     public function addLoginPassword()
     {
-        $a = new Conn();
-        $a->dbChekMake();
-
-        $user_login     = $_POST['registerLogin'];
-        $user_password  = $_POST['registerPassword'];
-        $user_password2 = $_POST['registerConfirm'];
-        $record = 27;
-        if ($user_password == $user_password2) {
-            if (isset($user_login) || isset($user_password)) {
-                if (empty($user_login) || empty($user_password)) {
-                    echo 'Данные введены неверно';
-                    return false;
-                } else {
-                    $user_login    = strip_tags($user_login);
-                    $user_password = strip_tags($user_password);
-
-                    $res = Users::where('username', $user_login)->get();
-
-                    foreach ($res as $item) {
-                        $record = $item->username;
-                    }
-
-                    if ($record != 27) {
-                        echo 'Такой пользователь уже существует';
+        $gump = new GumpCheck();
+        if ($gump->checkPostReg()) {
+            $user_login     = $_POST['registerLogin'];
+            $user_password  = $_POST['registerPassword'];
+            $user_password2 = $_POST['registerConfirm'];
+            $ip             = $_POST['ip'];
+            $record = 27;
+            if ($user_password == $user_password2) {
+                if (isset($user_login) || isset($user_password)) {
+                    if (empty($user_login) || empty($user_password)) {
+                        echo 'Данные введены неверно';
                         return false;
                     } else {
-                        $user = new Users();
-                        $user->username = $user_login;
-                        $user->password = $user_password;
-                        $user->save();
+                        $user_login    = strip_tags($user_login);
+                        $user_password = strip_tags($user_password);
 
                         $res = Users::where('username', $user_login)->get();
+
                         foreach ($res as $item) {
-                            $_SESSION['id'] = $item->id;
+                            $record = $item->username;
                         }
 
-                        $this->getInfo();
-                        return true;
+                        if ($record != 27) {
+                            echo 'Такой пользователь уже существует';
+                            return false;
+                        } else {
+                            $user = new Users();
+                            $user->username = $user_login;
+                            $user->password = $user_password;
+                            $user->ip       = $ip;
+                            $user->save();
+
+                            $res = Users::where('username', $user_login)->get();
+                            foreach ($res as $item) {
+                                $_SESSION['id'] = $item->id;
+                            }
+
+                            $this->getInfo();
+                            return true;
+                        }
+
+
+
+
+
+//
+//                        $a = new Conn();
+//
+//                        $result = $a->connect()->query(
+//                            "select * from users
+//                            where username = '$user_login' LIMIT 0,1"
+//                        );
+//                        $record = $result->fetch_assoc();
+//                        if (!empty($record)) {
+//                            echo 'Такой пользователь уже существует';
+//                            return false;
+//                        } else {
+//                            $a->connect()->query(
+//                                "INSERT INTO `users` (username, password, ip)
+//                                VALUES ('$user_login', '$user_password', '$ip')"
+//                            );
+//
+//                            $res = $a->connect()->query(
+//                                "select id from users where username = '$user_login' "
+//                            );
+//                            $record = $res->fetch_assoc();
+//                            $_SESSION ['id'] = $record ['id'];
+//                            $this->getInfo();
+//
+//                            return true;
+//                        }
                     }
-
-
-
-
-
-//
-//                    $a = new Connection();
-//
-//                    $result = $a->connect()->query(
-//                        "select * from users
-//                        where username = '$user_login' LIMIT 0,1"
-//                    );
-//                    $record = $result->fetch_assoc();
-//                    if (!empty($record)) {
-//                        echo 'Такой пользователь уже существует';
-//                        return false;
-//                    } else {
-//                        $a->connect()->query(
-//                            "INSERT INTO `users` (username, password)
-//                            VALUES ('$user_login', '$user_password')"
-//                        );
-//
-//                        $res = $a->connect()->query(
-//                            "select id from users where username = '$user_login' "
-//                        );
-//                        $record = $res->fetch_assoc();
-//                        $_SESSION ['id'] = $record ['id'];
-//                        $this->getInfo();
-//
-//                        return true;
-//                    }
                 }
+            } else {
+                echo 'Пароли не совпадают';
+                return false;
             }
         } else {
-            echo 'Пароли не совпадают';
             return false;
         }
     }
@@ -137,52 +141,57 @@ class User
      */
     public function addNameAgeAbout()
     {
-        $arr = '';
-        $id  = $_SESSION['id'];
+        $a = new GumpCheck();
+        if ($a->checkPostData()) {
+            $arr = '';
+            $id  = $_SESSION['id'];
 
-        if (empty($_POST['Username']) || empty($_POST['Password'])) {
-            echo 'Логин и пароль не могут быть пустыми';
-            return false;
-        } else {
-            $arr['username'] = strip_tags($_POST['Username']);
-            $arr['password'] = strip_tags($_POST['Password']);
-            $arr['name']     = strip_tags($_POST['Name']);
-            $arr['age']      = strip_tags($_POST['Age']);
-            $arr['about']    = strip_tags($_POST['About']);
-            $a = new Conn();
-            $db = new mysqli($a->host, $a->user, $a->password, $a->dbace);
-            if (!$db->set_charset('utf8')) {
-                printf(
-                    'Ошибка при загрузке набора символов utf8: %s\n',
-                    $db->error
-                );
-            }
-
-            if ($db->connect_errno) {
-                echo 'ошибка подключения к БР';
+            if (empty($_POST['Username']) || empty($_POST['Password'])) {
+                echo 'Логин и пароль не могут быть пустыми';
+                return false;
             } else {
-                $sql = " UPDATE users
-                          SET username = ?, 
-                          password = ?, 
-                          name = ?, 
-                          age = ?, 
-                          about = ? 
-                          WHERE id = ?";
-                if ($stmt = $db->prepare($sql)) {
-                    $stmt->bind_param(
-                        'sssisi',
-                        $arr['username'],
-                        $arr['password'],
-                        $arr['name'],
-                        $arr['age'],
-                        $arr['about'],
-                        $id
+                $arr['username'] = strip_tags($_POST['Username']);
+                $arr['password'] = strip_tags($_POST['Password']);
+                $arr['name']     = strip_tags($_POST['Name']);
+                $arr['age']      = strip_tags($_POST['Age']);
+                $arr['about']    = strip_tags($_POST['About']);
+                $a = new Conn();
+                $db = new mysqli($a->host, $a->user, $a->password, $a->dbace);
+                if (!$db->set_charset('utf8')) {
+                    printf(
+                        'Ошибка при загрузке набора символов utf8: %s\n',
+                        $db->error
                     );
-                    $stmt->execute();
-                    $this->getInfo();
-                    return true;
+                }
+
+                if ($db->connect_errno) {
+                    echo 'ошибка подключения к БР';
+                } else {
+                    $sql = " UPDATE users
+                              SET username = ?, 
+                              password = ?, 
+                              name = ?, 
+                              age = ?, 
+                              about = ? 
+                              WHERE id = ?";
+                    if ($stmt = $db->prepare($sql)) {
+                        $stmt->bind_param(
+                            'sssisi',
+                            $arr['username'],
+                            $arr['password'],
+                            $arr['name'],
+                            $arr['age'],
+                            $arr['about'],
+                            $id
+                        );
+                        $stmt->execute();
+                        $this->getInfo();
+                        return true;
+                    }
                 }
             }
+        } else {
+            return false;
         }
     }
 
@@ -278,7 +287,7 @@ class User
                 )
                 ) {
                     $imge = Imageres::make($target_file)
-                        ->resize($check[0], $check[1])->save($target_file);
+                        ->resize(480, 480)->save($target_file);
 
                     echo
                         "Файл "
@@ -365,7 +374,7 @@ class User
                 )
                 ) {
                     $imge = Imageres::make($target_file)
-                        ->resize(200, 200)->save($target_file);
+                        ->resize(480, 480)->save($target_file);
 
                     echo
                         'Файл '

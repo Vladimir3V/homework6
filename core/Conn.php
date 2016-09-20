@@ -58,7 +58,8 @@ class Conn
                              name VARCHAR(50),
                              age INT (3),
                              about VARCHAR(1000),
-                             avatar VARCHAR(50)
+                             avatar VARCHAR(50),
+                             ip VARCHAR (20)
                              )
                              DEFAULT CHARSET = utf8
                              COLLATE=utf8_unicode_ci

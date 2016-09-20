@@ -40,7 +40,9 @@ class ControllerRegister
             if ($this->user->addLoginPassword()) {
                 $this->mail->sentMail();
                 $this->dotwig->letsDoTwig();
-            };
+            } else {
+                $this->showRegister();
+            }
 
         }
     }

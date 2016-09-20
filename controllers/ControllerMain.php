@@ -28,37 +28,34 @@ class ControllerMain
 
     public function addAvatar()
     {
-        if ($this->user->addAvatar()) {
-            $this->showMain();
-        }
+        $this->user->addAvatar();
+        $this->showMain();
     }
 
     public function addPicture()
     {
-        if ($this->user->addPicture()) {
-            $this->showMain();
-        }
+        $this->user->addPicture();
+        $this->showMain();
+
     }
 
     public function addUserInfo()
     {
-        if ($this->user->addNameAgeAbout()) {
-            $this->showMain();
-        }
+        $this->user->addNameAgeAbout();
+        $this->showMain();
+
     }
 
     public function getPhotoList()
     {
-        if ($this->user->getAllPhoto()) {
-            $this->showMain();
-        }
+        $this->user->getAllPhoto();
+        $this->showMain();
     }
 
     public function getUserList()
     {
-        if ($this->user->getAllUser()) {
-            $this->showMain();
-        }
+        $this->user->getAllUser();
+        $this->showMain();
     }
 
     public function delUser()
