@@ -94,37 +94,6 @@ class User
                             $this->getInfo();
                             return true;
                         }
-
-
-
-
-
-//
-//                        $a = new Conn();
-//
-//                        $result = $a->connect()->query(
-//                            "select * from users
-//                            where username = '$user_login' LIMIT 0,1"
-//                        );
-//                        $record = $result->fetch_assoc();
-//                        if (!empty($record)) {
-//                            echo 'Такой пользователь уже существует';
-//                            return false;
-//                        } else {
-//                            $a->connect()->query(
-//                                "INSERT INTO `users` (username, password, ip)
-//                                VALUES ('$user_login', '$user_password', '$ip')"
-//                            );
-//
-//                            $res = $a->connect()->query(
-//                                "select id from users where username = '$user_login' "
-//                            );
-//                            $record = $res->fetch_assoc();
-//                            $_SESSION ['id'] = $record ['id'];
-//                            $this->getInfo();
-//
-//                            return true;
-//                        }
                     }
                 }
             } else {
@@ -155,40 +124,16 @@ class User
                 $arr['name']     = strip_tags($_POST['Name']);
                 $arr['age']      = strip_tags($_POST['Age']);
                 $arr['about']    = strip_tags($_POST['About']);
-                $a = new Conn();
-                $db = new mysqli($a->host, $a->user, $a->password, $a->dbace);
-                if (!$db->set_charset('utf8')) {
-                    printf(
-                        'Ошибка при загрузке набора символов utf8: %s\n',
-                        $db->error
-                    );
-                }
 
-                if ($db->connect_errno) {
-                    echo 'ошибка подключения к БР';
-                } else {
-                    $sql = " UPDATE users
-                              SET username = ?, 
-                              password = ?, 
-                              name = ?, 
-                              age = ?, 
-                              about = ? 
-                              WHERE id = ?";
-                    if ($stmt = $db->prepare($sql)) {
-                        $stmt->bind_param(
-                            'sssisi',
-                            $arr['username'],
-                            $arr['password'],
-                            $arr['name'],
-                            $arr['age'],
-                            $arr['about'],
-                            $id
-                        );
-                        $stmt->execute();
-                        $this->getInfo();
-                        return true;
-                    }
-                }
+                $user = Users::find($id);
+                $user->username = $arr['username'];
+                $user->password = $arr['password'];
+                $user->name     = $arr['name'];
+                $user->age      = $arr['age'];
+                $user->about    = $arr['about'];
+                $user->save();
+                $this->getInfo();
+                return true;
             }
         } else {
             return false;
@@ -203,7 +148,7 @@ class User
     {
         if (empty($_POST["g-recaptcha-response"])) {
             echo 'Подтвердите что вы человек';
-            return true;
+            return false;
         } else {
             if (isset($_POST['usernameLogin']) || isset($_POST['passwordLogin'])) {
                 if (empty($_POST['usernameLogin'])
@@ -211,21 +156,21 @@ class User
                 ) {
                     echo 'Проерьте ведденые данные или пройдите регистрацию';
                 } else {
+                    $login = null;
+                    $password = null;
+                    $id = null;
                     $user_login    = $_POST['usernameLogin'];
                     $user_password = $_POST['passwordLogin'];
-                    $a = new Conn();
-                    $result = $a->connect()->query(
-                        "select * from users where username = '$user_login' LIMIT 0,1"
-                    );
-                    $record = $result->fetch_assoc();
 
-                    if (isset($result) && $record ['password'] == $user_password) {
-                        echo 1;
-                        $res = $a->connect()->query(
-                            "select id from users where username = '$user_login' "
-                        );
-                        $record = $res->fetch_assoc();
-                        $_SESSION ['id'] = $record ['id'];
+                    $users = Users::where('username', $user_login)->get()->toArray();
+                    foreach ($users as $user) {
+                        $login = $user['username'];
+                        $password = $user['password'];
+                        $id = $user['id'];
+                    }
+
+                    if ($login != null && $password == $user_password) {
+                        $_SESSION ['id'] = $id;
                         $this->getInfo();
                         return true;
                     } else {
@@ -294,29 +239,11 @@ class User
                         . basename($img['img']['name'])
                         . " был загружен <br><br>";
 
-                    $a = new Conn();
-                    $db = new mysqli(
-                        $a->host,
-                        $a->user,
-                        $a->password,
-                        $a->dbace
-                    );
-                    if ($db->connect_errno) {
-                        exit("ошибка подключения к БД, повторите запрос");
-                    }
-                    if (!$db->set_charset("utf8")) {
-                        printf(
-                            "Ошибка при загрузке набора символов utf8: %s\n",
-                            $db->error
-                        );
-                    }
 
-                    $sql = "INSERT INTO photos (user_id, file) VALUES(?, ?)";
-                    $stmt = $db->prepare($sql);
-                    $stmt->bind_param('is', $id, $img['img']['name']);
-                    $stmt->execute();
-                    $stmt->close();
-                    $db->close();
+                    $photo = new Photos();
+                    $photo->user_id = $id;
+                    $photo->file    = $img['img']['name'];
+                    $photo->save();
                     return true;
                 }
                 return false;
@@ -381,38 +308,10 @@ class User
                         . basename($img['img']['name'])
                         . ' был загружен <br><br>';
 
-                    $a = new Conn();
-                    $db = new mysqli(
-                        $a->host,
-                        $a->user,
-                        $a->password,
-                        $a->dbace
-                    );
-                    if ($db->connect_errno) {
-                        exit('ошибка подключения к БД, повторите запрос');
-                    }
-                    if (!$db->set_charset('utf8')) {
-                        printf(
-                            'Ошибка при загрузке набора символов utf8: %s\n',
-                            $db->error
-                        );
-                    }
-
-                    $sql = 'UPDATE users
-                          SET avatar = ?
-                          WHERE id = ?';
-                    if ($stmt = $db->prepare($sql)) {
-                        $stmt->bind_param(
-                            'si',
-                            $filename,
-                            $id
-                        );
-                        $stmt->execute();
-                        $this->getInfo();
-                        return true;
-                    } else {
-                        echo 'не получилось';
-                    }
+                    $user = Users::find($id);
+                    $user->avatar = $filename;
+                    $user->save();
+                    $this->getInfo();
                 }
                 return false;
             }
@@ -426,19 +325,10 @@ class User
     public function getAllPhoto()
     {
         $id = $_SESSION['id'];
-        $a = new Conn();
-        $res = $a -> connect()->query(
-            "select file from photos where user_id = '$id'"
-        );
-
-        $record = $res->fetch_all();
-        foreach ($record as $item) {
-            foreach ($item as $item) {
-                echo $item;
-                echo '<br>';
-            }
+        $photos = Photos::where('user_id',$id)->get()->toArray();
+        foreach ($photos as $photo) {
+            echo $photo['file'],'<br>';
         }
-        return true;
     }
 
     /**
@@ -447,34 +337,22 @@ class User
      */
     public function getAllUser()
     {
-        $a = new Conn();
-        $res = $a -> connect()->query(
-        "select name,age from users ORDER BY age"
-    );
+        $users = Users::orderBy('age')->get()->toArray();
+        foreach ($users as $user) {
+            echo 'Имя: ', $user['username'], ' Возраст: ', $user ['age'], ' - ';
+            switch ($user['age']) {
+                case null:
+                    echo 'Возраст не заведен';
+                    break;
+                case ($user['age'] >= '18'):
+                    echo 'совершеннолетний';
+                    break;
+                default:
+                    echo 'несовершеннолетний';
 
-        $record = $res->fetch_all();
-        foreach ($record as $item) {
-            echo '<br>';
-            foreach ($item as $key=>$value) {
-                if ($key == 0 ) {
-                    echo 'Имя: ', $value, ',  ';
-                };
-                if ($key == 1 ) {
-                    echo 'Возраст: ', $value, ' - ';
-                    switch ($value) {
-                        case null:
-                            echo 'Возраст не заведен';
-                            break;
-                        case ($value >= '18'):
-                            echo 'совершеннолетний';
-                            break;
-                        default:
-                            echo 'несовершеннолетний';
-                    }
-                }
             }
+            echo '<br>';
         }
-
         return true;
     }
 
@@ -484,12 +362,10 @@ class User
     public function deletUser()
     {
         $userid = $_SESSION ['id'];
-        $a = new Conn();
-        $a->connect()->query("DELETE FROM `users` WHERE 'id' = $userid");
+        $users = Users::where('id',$userid)->delete();
         unset($_SESSION['id']);
         session_destroy();
         return true;
-
     }
 }
 

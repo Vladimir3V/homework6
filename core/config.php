@@ -32,10 +32,12 @@ use Illuminate\Database\Eloquent\Model;
 class Users extends Model
 {
     protected $table = 'users';
+    public $timestamps = false;
 }
 
 class Photos extends Model
 {
     protected $table = 'photos';
+    public $timestamps = false;
 }
 

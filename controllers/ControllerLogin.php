@@ -27,7 +27,9 @@ class ControllerLogin
         } else {
             if ($this->user->checkLoginPassword()) {
                 $this->dotwig->letsDoTwig();
-            };
+            } else {
+                $this->showLogin();
+            }
         }
     }
     public function showLogin()
