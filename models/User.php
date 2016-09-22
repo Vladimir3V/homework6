@@ -54,6 +54,8 @@ class User
      */
     public function addLoginPassword()
     {
+        $a = new Conn();
+        $a->dbChekMake();
         $gump = new GumpCheck();
         if ($gump->checkPostReg()) {
             $user_login     = $_POST['registerLogin'];
@@ -146,6 +148,8 @@ class User
      */
     public function checkLoginPassword()
     {
+        $a = new Conn();
+        $a->dbChekMake();
         if (empty($_POST["g-recaptcha-response"])) {
             echo 'Подтвердите что вы человек';
             return false;

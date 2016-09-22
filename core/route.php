@@ -32,6 +32,7 @@ class Route
         include_once 'vendor/autoload.php';
         include_once 'core/config.php';
 
+
         function fileAutoload($class_name)
         {
             if (file_exists('models/' . $class_name . '.php')) {
