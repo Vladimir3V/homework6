@@ -13,11 +13,11 @@ class ControllerRegister
     public $mail;
     public $dotwig;
 
-    function __construct()
+    function __construct()//psr-2 у всех методов public private or protected
     {
-        $this->user = new User();
+        $this->user   = new User();
         $this->toview = new ToView();
-        $this->mail = new Mail();
+        $this->mail   = new Mail();
         $this->dotwig = new DoTwig();
     }
 
@@ -29,7 +29,6 @@ class ControllerRegister
         } else {
             $this->toview->pRegister();
         }
-
     }
 
     public function checkPassword()

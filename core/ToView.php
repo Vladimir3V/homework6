@@ -13,7 +13,7 @@ class ToView
         include_once 'view/404.html';
     }
 
-    public function pLogin ()
+    public function pLogin ()//psr-2
     {
         include_once 'view/login.html';
     }

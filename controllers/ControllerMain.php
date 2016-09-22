@@ -12,7 +12,7 @@ class ControllerMain
     public $toview;
     public $dotwig;
 
-    function __construct()
+    function __construct()//psr-2
     {
         $this->user   = new User();
         $this->toview = new ToView();

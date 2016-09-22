@@ -18,7 +18,7 @@ $capsule->addConnection
     'host'  => 'localhost',
     'database' => 'uzzerz',
     'username' => 'root',
-    'password' => 'root',
+    'password' => '',
     'charset' => 'utf8',
     'collation' => 'utf8_unicode_ci',
     'prefix'    => ''
@@ -27,17 +27,17 @@ $capsule->addConnection
 $capsule->setAsGlobal();
 $capsule->bootEloquent();
 
-use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Model;//psr-2 подключение namespace только вверху!!!
 
 class Users extends Model
 {
-    protected $table = 'users';
+    protected $table = 'users';//psr-2
     public $timestamps = false;
 }
 
 class Photos extends Model
 {
-    protected $table = 'photos';
+    protected $table   = 'photos';
     public $timestamps = false;
 }
 

@@ -195,8 +195,8 @@ class User
 
         $id = $_SESSION['id'];
 
-        $img = $_FILES;
-        $target_dir = 'img/photos/';
+        $img         = $_FILES;
+        $target_dir  = 'img/photos/';
         $target_file = $target_dir . basename($img['img']['name']);
         $status = true;
         $imageType = pathinfo($target_file, PATHINFO_EXTENSION);
@@ -362,7 +362,7 @@ class User
     public function deletUser()
     {
         $userid = $_SESSION ['id'];
-        $users = Users::where('id',$userid)->delete();
+        $users  = Users::where('id',$userid)->delete();
         unset($_SESSION['id']);
         session_destroy();
         return true;

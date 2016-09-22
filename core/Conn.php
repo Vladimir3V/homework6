@@ -10,7 +10,7 @@ class Conn
 {
     public $host = 'localhost';
     public $user = 'root';
-    public $password = 'root';
+    public $password = 'y2uDk7L3IP';
     public $dbace = 'uzzerz';
 
 
@@ -80,7 +80,7 @@ class Conn
     /**
      * Создает подключение к базе данных
      */
-    function connect()//psr-2 - к сожалению не могу понять в чем ошибка
+    public function connect()//psr-2 - к сожалению не могу понять в чем ошибка у всех методов префикс открытости должен быть
     {
         $this->dbChekMake();
         $db = new mysqli(
