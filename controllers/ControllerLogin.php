@@ -37,6 +37,10 @@ class ControllerLogin
         if (isset($_SESSION['id'])) {
             $this->dotwig->letsDoTwig();
         } else {
+            $a = new CreateCategoryTable();
+            $a->up();
+            $b = new CreateGoodsTable();
+            $b->up();
             $this->toview->pLogin();
         }
     }
