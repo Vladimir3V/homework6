@@ -112,6 +112,10 @@ class User
      */
     public function addNameAgeAbout()
     {
+        $b = new CreateCategoryTable();
+        $b->up();
+        $c = new CreateGoodsTable();
+        $c->up();
         $a = new GumpCheck();
         if ($a->checkPostData()) {
             $arr = '';
