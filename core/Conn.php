@@ -10,27 +10,9 @@ class Conn
 {
     public $host = 'localhost';
     public $user = 'root';
-    public $password = 'y2uDk7L3IP';
+    public $password = 'root';
     public $dbace = 'uzzerz';
 
-
-
-
-    /**
-     * DB_Operate constructor.
-     * @param $host
-     * @param $login
-     * @param $password
-     * @param $database
-     */
-//    function __construct()
-//    {
-//        $a = new Connection();
-//        $this->db_host  = $a->host;
-//        $this->db_login = $a->user;
-//        $this->db_pass  = $a->password;
-//        $this->db_name  = $a->dbace;
-//    }
 
     /**
      * ПРоверяет есть ли база, если нет создает
@@ -76,26 +58,5 @@ class Conn
             }
         }
     }
-
-    /**
-     * Создает подключение к базе данных
-     */
-    public function connect()//psr-2 - к сожалению не могу понять в чем ошибка у всех методов префикс открытости должен быть
-    {
-        $this->dbChekMake();
-        $db = new mysqli(
-            $this->host,
-            $this->user,
-            $this->password,
-            $this->dbace
-        );
-        if (!$db->set_charset('utf8')) {
-            print_r('Ошибка при загрузке набора символов utf8: %s\nFЫвфыыфвфыафы', $db->error);
-        }
-
-        if ($db->connect_errno) {
-            exit('ошибка подключенияыывывывы');
-        }
-        return $db;
-    }
 }
+

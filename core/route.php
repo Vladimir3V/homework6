@@ -38,7 +38,9 @@ class Route
             if (file_exists('models/' . $class_name . '.php')) {
                 include 'models/' . $class_name . '.php';
             } else {
-                include 'core/' . $class_name . '.php';
+                if (file_exists('core/' . $class_name . '.php')) {
+                    include 'core/' . $class_name . '.php';
+                }
             }
         }
 
@@ -60,22 +62,13 @@ class Route
         } else {
             Route::errorPage404();
         }
-
-        function __autoload($class_name)
-        {
-            include 'models/' . $class_name . '.php';
-            include 'core/' . $class_name . '.php';
-            print_r('models/' . $class_name . '.php');
-//            if (include 'core/' . $class_name . '.php') {
-//            } else {
-//                include 'models/' . $class_name . '.php';
-//            }
-        }
-
     }
 
 
-    static function errorPage404()//psr-2 -- не могу понять в чем ошибка
+    /**
+     *
+     */
+    static function errorPage404()
     {
         $host = 'http://'.$_SERVER['HTTP_HOST'].'/';
         header('Location:'.$host.'view/404.html');
