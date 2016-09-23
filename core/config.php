@@ -8,6 +8,7 @@
 
 require 'vendor/autoload.php';
 
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Capsule\Manager as Capsule;
 
 $capsule = new Capsule;
@@ -18,20 +19,21 @@ $capsule->addConnection
     'host'  => 'localhost',
     'database' => 'uzzerz',
     'username' => 'root',
-    'password' => '',
+    'password' => 'root',
     'charset' => 'utf8',
     'collation' => 'utf8_unicode_ci',
     'prefix'    => ''
     ]);
 
+
 $capsule->setAsGlobal();
 $capsule->bootEloquent();
 
-use Illuminate\Database\Eloquent\Model;//psr-2 подключение namespace только вверху!!!
+
 
 class Users extends Model
 {
-    protected $table = 'users';//psr-2
+    protected $table   = 'users';
     public $timestamps = false;
 }
 

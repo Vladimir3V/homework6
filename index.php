@@ -7,7 +7,7 @@ session_start();
  * Time: 11:05
  */
 
-//ini_set('display_errors', 1);
+ini_set('display_errors', 1);
 require_once 'core/route.php';
 
 Route::start();

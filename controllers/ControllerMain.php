@@ -12,6 +12,9 @@ class ControllerMain
     public $toview;
     public $dotwig;
 
+    /**
+     * ControllerMain constructor.
+     */
     function __construct()//psr-2
     {
         $this->user   = new User();
@@ -21,17 +24,26 @@ class ControllerMain
     }
 
 
+    /**
+     *
+     */
     public function showMain()
     {
         $this->dotwig->letsDoTwig();
     }
 
+    /**
+     *
+     */
     public function addAvatar()
     {
         $this->user->addAvatar();
         $this->showMain();
     }
 
+    /**
+     *
+     */
     public function addPicture()
     {
         $this->user->addPicture();
@@ -39,6 +51,9 @@ class ControllerMain
 
     }
 
+    /**
+     *
+     */
     public function addUserInfo()
     {
         $this->user->addNameAgeAbout();
@@ -46,18 +61,27 @@ class ControllerMain
 
     }
 
+    /**
+     *
+     */
     public function getPhotoList()
     {
         $this->user->getAllPhoto();
         $this->showMain();
     }
 
+    /**
+     *
+     */
     public function getUserList()
     {
         $this->user->getAllUser();
         $this->showMain();
     }
 
+    /**
+     *
+     */
     public function delUser()
     {
         if ($this->user->deletUser()) {

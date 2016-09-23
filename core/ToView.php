@@ -8,16 +8,25 @@
  */
 class ToView
 {
+    /**
+     *
+     */
     public function p404()
     {
         include_once 'view/404.html';
     }
 
-    public function pLogin ()//psr-2
+    /**
+     *
+     */
+    public function pLogin()
     {
         include_once 'view/login.html';
     }
 
+    /**
+     *
+     */
     public function pRegister()
     {
         include_once 'view/register.html';

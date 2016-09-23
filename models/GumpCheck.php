@@ -8,14 +8,19 @@
  */
 class GumpCheck
 {
+    /**
+     * @return bool
+     */
     public function checkPostReg()
     {
         $_POST['ip'] = $_SERVER['REMOTE_ADDR'];
 
-        $result = GUMP::is_valid($_POST,[
+        $result = GUMP::is_valid(
+            $_POST, [
             'registerLogin' => 'required|min_len,5',
             'ip' => 'valid_ip'
-        ]);
+            ]
+        );
 
         if ($result === true) {
             return true;
@@ -25,11 +30,16 @@ class GumpCheck
         }
     }
 
+    /**
+     * @return bool
+     */
     public function checkPostData()
     {
-        $result= GUMP::is_valid($_POST, [
+        $result= GUMP::is_valid(
+            $_POST, [
             'About' => 'required|min_len,50'
-        ]);
+            ]
+        );
 
         if ($result === true && $_POST['Age']>10 && $_POST['Age']<100) {
             return true;

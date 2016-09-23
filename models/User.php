@@ -329,7 +329,7 @@ class User
     public function getAllPhoto()
     {
         $id = $_SESSION['id'];
-        $photos = Photos::where('user_id',$id)->get()->toArray();
+        $photos = Photos::where('user_id', $id)->get()->toArray();
         foreach ($photos as $photo) {
             echo $photo['file'],'<br>';
         }
@@ -366,7 +366,7 @@ class User
     public function deletUser()
     {
         $userid = $_SESSION ['id'];
-        $users  = Users::where('id',$userid)->delete();
+        $users  = Users::where('id', $userid)->delete();
         unset($_SESSION['id']);
         session_destroy();
         return true;

@@ -1,6 +1,5 @@
 <?php
-//require_once 'vendor/autoload.php';
-//require_once 'vendor/twig/twig/lib/Twig/Autoloader.php';
+
 /**
  * Created by PhpStorm.
  * User: vladimirvahrusev
@@ -12,8 +11,6 @@ class DoTwig
     public function letsDoTwig()
     {
         try {
-//            include_once 'vendor/twig/twig/lib/Twig/Autoloader.php';
-//            Twig_Autoloader::register();
             $loader = new Twig_Loader_Filesystem('view');
             $twig = new Twig_Environment($loader);
             $template = $twig->loadTemplate('main.tmpl');
